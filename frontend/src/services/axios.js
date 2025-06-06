@@ -1,15 +1,16 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
+// Base axios config
 const api = axios.create({
   baseURL: 'http://localhost:8000',
-  withCredentials: true,
+  withCredentials: true, // important for Sanctum cookie auth
   headers: {
     Accept: 'application/json',
   },
 });
 
-axios.interceptors.request.use(config => {
+// Add Authorization header if token exists in localStorage
+api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -19,7 +20,7 @@ axios.interceptors.request.use(config => {
   return config;
 });
 
-// New helper to ensure CSRF cookie is loaded
+// Helper to fetch CSRF cookie from Sanctum
 export async function getCsrfCookie() {
   await api.get('/sanctum/csrf-cookie');
 }

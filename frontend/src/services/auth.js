@@ -1,34 +1,46 @@
-import api from './axios';
-
-// This gets the CSRF cookie from Laravel Sanctum
-export const getCsrfToken = () => api.get('/sanctum/csrf-cookie');
+import api, { getCsrfCookie } from './axios';
 
 // Registration API call
 export const register = async (data) => {
-  await getCsrfToken();
-  return api.post('/api/register', data);
+  await getCsrfCookie(); // Fetch CSRF cookie first
+
+  const response = await api.post('/api/register', data);
+
+  // If your backend returns token on register, save it:
+  if (response.data.token) {
+    localStorage.setItem('token', response.data.token);
+  }
+
+  return response.data;
 };
 
 // Login API call
 export const login = async (data) => {
-  await getCsrfToken();
-await api.post('/api/login', data);
+  await getCsrfCookie(); // Fetch CSRF cookie first
+
+  const response = await api.post('/api/login', data);
+
+  // Save token returned by backend
+  localStorage.setItem('token', response.data.token);
+
+  return response.data;
 };
 
 // Logout API call
-export const logout = () => api.post('/api/logout');
+export const logout = async () => {
+  await api.post('/api/logout');
+  localStorage.removeItem('token');
+};
+
 // Get authenticated user info
 export const getUser = () => api.get('/api/user');
 
-// Get user list (assuming GET, change to POST if your backend expects that)
+// Get user list (update method/endpoint if required)
 export const userList = () => api.get('/api/user-list');
 
-// Usage example
+// Example usage - optional
 async function fetchUserList() {
   try {
-    // Only call getCsrfToken if you have not logged in yet or session expired
-    // await getCsrfToken(); // usually not needed here if already logged in
-
     const response = await userList();
     console.log(response.data);
   } catch (error) {
