@@ -6,6 +6,7 @@ export default function Header({ user, setUser }) {
     const handleLogout = async () => {
         try {
             await logout();
+            localStorage.removeItem('token');
             setUser(null); // update state in App
             navigate('/login'); // go to home page
         } catch (err) {

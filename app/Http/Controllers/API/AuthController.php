@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Crypt;
 
 class AuthController extends Controller
 {
@@ -30,56 +29,61 @@ class AuthController extends Controller
         return response()->json(['message' => 'Registered']);
     }
 
-    // public function login(Request $request)
-    // {
-    //     $request->validate([
-    //         'email' => 'required|string|email',
-    //         'password' => 'required|string',
-    //         'captcha' => 'required|captcha'
-    //     ]);
-
-    //     if (!Auth::attempt($request->only('email', 'password'))) {
-    //         return response()->json(['message' => 'Invalid credentials'], 401);
-    //     }
-
-    //     return response()->json(['message' => 'Logged in']);
-    // }
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-            'captcha' => 'required|captcha'
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
-        if (!Auth::guard('web')->attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $request->session()->token(); // 🔴 This is the critical step
+        $user = Auth::user();
 
-        return response()->json(['message' => 'Logged in']);
+        // 🔑 Generate token
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Logged in',
+            'token' => $token,
+            'user' => $user
+        ]);
     }
+
     public function user(Request $request)
     {
         return $request->user();
     }
 
-    public function logout(Request $request)
-    {
-        Auth::logout();
-
-        $request->session()->invalidate();       // Invalidate the session
-        $request->session()->regenerateToken();  // Regenerate CSRF token
-
-        return response()->json(['message' => 'Logged out']);
-    }
-    // public function userList()
+    // public function logout(Request $request)
     // {
-    //     $users = User::all();
-    //     return response()->json([
-    //         'message' => 'User List',
-    //         'data' => $users
-    //     ]);
+    //     // This deletes token matching the token string in the Authorization header
+    //     $tokenString = $request->user()->currentAccessToken()?->token;
+
+    //     if ($tokenString) {
+    //         $request->user()->tokens()->where('token', $tokenString)->delete();
+    //     }
+
+    //     return response()->json(['message' => 'Logged out successfully']);
     // }
+
+    public function logout(Request $request)
+{
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['message' => 'Unauthenticated'], 401);
+    }
+
+    $tokensCountBefore = $user->tokens()->count();
+
+    $user->tokens()->delete();
+
+    $tokensCountAfter = $user->tokens()->count();
+
+    \Log::info("User {$user->id} logout: tokens before={$tokensCountBefore}, tokens after={$tokensCountAfter}");
+
+    return response()->json(['message' => 'Logged out successfully']);
+}
 }

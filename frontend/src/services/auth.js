@@ -17,7 +17,6 @@ await api.post('/api/login', data);
 
 // Logout API call
 export const logout = () => api.post('/api/logout');
-
 // Get authenticated user info
 export const getUser = () => api.get('/api/user');
 

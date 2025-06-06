@@ -9,8 +9,10 @@ import Dashboard from '../pages/Dashboard';
 export default function AppRoutes({ user, setUser }) {
     return (
         <Routes>
+            <Route path="/login" element={<Login />} />
             {/* Public Routes */}
             <Route path="/" element={<PublicLayout />}>
+                <Route index element={<Navigate to="/login" />} /> {/* 👈 This line added */}
                 <Route path="login" element={<Login setUser={setUser} user={user} />} />
                 <Route path="surveyor-login" element={<SurveyorLogin setUser={setUser} user={user} />} />
                 <Route path="forgot-password" element={<ForgotPassword setUser={setUser} user={user} />} />
@@ -30,8 +32,7 @@ export default function AppRoutes({ user, setUser }) {
                 <Route path="dashboard" element={<Dashboard user={user} />} />
             </Route>
 
-            {/* Catch-all */}
-            <Route path="*" element={<Navigate to="/login" />} />
+
         </Routes>
     );
 }
