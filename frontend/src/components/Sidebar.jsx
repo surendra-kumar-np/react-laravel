@@ -9,6 +9,7 @@ export default function Sidebar({ user, setUser }) {
         try {
             await logout();
             setUser(null);
+            localStorage.removeItem('token');
             navigate('/login');
         } catch (err) {
             console.error('Logout failed:', err);
@@ -193,13 +194,14 @@ export default function Sidebar({ user, setUser }) {
                         <span className="menu-text">ATR Report</span>
                     </a>
                 </li>
-
-                <li className="menu-item-edit-profile">
-                    <a href="https://cleanair.bihar.gov.in/admin/staff/edit_profile" aria-expanded="false">
+                <li className="menu-item-my-profile">
+                    <Link to="/my-profile">
                         <i className="fa fa-user-circle-o menu-icon"></i>
                         <span className="menu-text">My Profile</span>
-                    </a>
+
+                    </Link>
                 </li>
+
                 {user && (
                     <li>
                         <a href="logout" onClick={handleLogout} aria-expanded="false">

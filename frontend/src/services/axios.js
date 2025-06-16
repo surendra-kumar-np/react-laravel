@@ -1,28 +1,20 @@
 import axios from 'axios';
 
-// Base axios config
 const api = axios.create({
   baseURL: 'http://localhost:8000',
-  withCredentials: true, // important for Sanctum cookie auth
+  withCredentials: true,        // 🔴 MUST be true to send/receive cookies
   headers: {
-    Accept: 'application/json',
+    Accept: 'application/json', // Laravel expects this
   },
 });
 
-// Add Authorization header if token exists in localStorage
+// Automatically attach Bearer token (if stored) on every request
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  } else {
-    delete config.headers.Authorization;
   }
   return config;
 });
-
-// Helper to fetch CSRF cookie from Sanctum
-export async function getCsrfCookie() {
-  await api.get('/sanctum/csrf-cookie');
-}
 
 export default api;

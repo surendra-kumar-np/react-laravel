@@ -1,51 +1,44 @@
-import api, { getCsrfCookie } from './axios';
+import api from './axios';
 
-// Registration API call
+
+export const getCsrfCookie = () => {
+  return api.get('/sanctum/csrf-cookie');
+};
+
 export const register = async (data) => {
-  await getCsrfCookie(); // Fetch CSRF cookie first
-
-  const response = await api.post('/api/register', data);
-
-  // If your backend returns token on register, save it:
-  if (response.data.token) {
-    localStorage.setItem('token', response.data.token);
-  }
-
-  return response.data;
+  await getCsrfCookie();
+  return api.post('/api/register', data);
 };
 
-// Login API call
 export const login = async (data) => {
-  await getCsrfCookie(); // Fetch CSRF cookie first
-
-  const response = await api.post('/api/login', data);
-
-  // Save token returned by backend
-  localStorage.setItem('token', response.data.token);
-
-  return response.data;
+  await getCsrfCookie();
+  return api.post('/api/login', data);
 };
 
-// Logout API call
 export const logout = async () => {
-  await api.post('/api/logout');
-  localStorage.removeItem('token');
+  await getCsrfCookie();
+  return api.post('/api/logout');
 };
 
-// Get authenticated user info
-export const getUser = () => api.get('/api/user');
+export const getUser = () => {
+  return api.get('/api/user');
+};
 
-// Get user list (update method/endpoint if required)
-export const userList = () => api.get('/api/user-list');
+export const userList = () => {
+  return api.get('/api/user-list');
+};
 
-// Example usage - optional
-async function fetchUserList() {
-  try {
-    const response = await userList();
-    console.log(response.data);
-  } catch (error) {
-    console.error('API error:', error.response?.status, error.response?.data);
-  }
-}
+export const updateProfile = async (data) => {
+  await getCsrfCookie();
+  return api.put('/api/update-profile', data);
+};
 
-fetchUserList();
+export const changePassword = async (data) => {
+  await getCsrfCookie();
+  return api.put('/api/change-password', data);
+};
+// export const forgotPassword = async (data) => {
+//   await getCsrfCookie();
+//   return api.post('/api/forgot-password', data);
+// };
+

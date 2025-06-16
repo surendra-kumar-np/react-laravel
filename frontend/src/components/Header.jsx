@@ -7,8 +7,8 @@ export default function Header({ user, setUser }) {
         try {
             await logout();
             localStorage.removeItem('token');
-            setUser(null); // update state in App
-            navigate('/login'); // go to home page
+            setUser(null);
+            navigate('/login');
         } catch (err) {
             console.error('Logout failed:', err);
         }
@@ -35,21 +35,10 @@ export default function Header({ user, setUser }) {
                                     </span>
                                 </>
                             )}
-
-                            {/* <a href="mailto:caap.bihar@gmail.com">caap.bihar@gmail.com</a> */}
                         </a>
-                        {/* Uncomment if needed */}
-                        {/* <ul className="staff_location"></ul> */}
                     </div>
                 </div>
                 <div id="logo">
-                    {/* Logo images commented out */}
-                    {/* <img src="" alt="" /> */}
-                    {/* <img
-            src="https://cleanair.bihar.gov.in/uploads/company/logo.jpg"
-            alt=""
-            style={{ width: 75, height: 55 }}
-          /> */}
                 </div>
                 <nav>
                     <div className="small-logo">
@@ -124,7 +113,6 @@ export default function Header({ user, setUser }) {
                                 alt=""
                                 style={{ width: 75, height: 55 }}
                             />
-                            {/* <img src="" alt="" style={{ width: 75, height: 55 }} /> */}
                         </li>
                     </ul>
                 </nav>

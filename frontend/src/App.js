@@ -2,6 +2,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import AppRoutes from './routes/AppRoutes';
 import { getUser } from './services/auth';
+import { FlashMessageProvider } from './services/FlashMessageContext';
+import FlashMessage from './components/FlashMessage';
 
 function App() {
     const [user, setUser] = useState(null);
@@ -17,9 +19,12 @@ function App() {
     if (loading) return <p>Loading...</p>;
 
     return (
-        <BrowserRouter>
-            <AppRoutes user={user} setUser={setUser} />
-        </BrowserRouter>
+        <FlashMessageProvider>
+            <FlashMessage />
+            <BrowserRouter>
+                <AppRoutes user={user} setUser={setUser} />
+            </BrowserRouter>
+        </FlashMessageProvider>
     );
 }
 
