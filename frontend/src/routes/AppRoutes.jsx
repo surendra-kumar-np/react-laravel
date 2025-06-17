@@ -6,6 +6,7 @@ import SurveyorLogin from '../pages/SurveyorLogin';
 import ForgotPassword from '../pages/ForgotPassword';
 import Dashboard from '../pages/Dashboard';
 import MyProfile from '../pages/MyProfile';
+import Users from '../pages/Users';
 
 export default function AppRoutes({ user, setUser }) {
     return (
@@ -30,6 +31,7 @@ export default function AppRoutes({ user, setUser }) {
                 }
             >
                 <Route path="dashboard" element={<Dashboard user={user} setUser={setUser} />} />
+                <Route path="users" element={<Users user={user} setUser={setUser} />} />
                 <Route path="my-profile" element={<MyProfile user={user} setUser={setUser} />} />
             </Route>
         </Routes>

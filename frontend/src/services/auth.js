@@ -1,6 +1,5 @@
 import api from './axios';
 
-
 export const getCsrfCookie = () => {
   return api.get('/sanctum/csrf-cookie');
 };
@@ -37,8 +36,9 @@ export const changePassword = async (data) => {
   await getCsrfCookie();
   return api.put('/api/change-password', data);
 };
-// export const forgotPassword = async (data) => {
-//   await getCsrfCookie();
-//   return api.post('/api/forgot-password', data);
-// };
+
+export const changeStatus = async (id) => {
+    await getCsrfCookie();
+    return api.post(`/api/users/${id}/change-status`, { id });
+};
 

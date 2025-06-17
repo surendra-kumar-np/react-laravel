@@ -1,12 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
-use Mews\Captcha\Facades\Captcha;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DashboardController;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,4 +26,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::put('/update-profile', [UserController::class, 'updateProfile']);
     Route::put('/change-password', [UserController::class, 'changePassword']);
+    Route::post('/users/{id}/change-status', [UserController::class, 'changeStatus']);
 });

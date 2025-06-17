@@ -44,7 +44,7 @@
 
         // aria-labelledby attribute fot gallery
         ariaLabelledby: '',
-        
+
         //aria-describedby attribute for gallery
         ariaDescribedby: '',
 
@@ -2320,7 +2320,7 @@
 }(this, function ($) {
 
 (function() {
-    
+
         'use strict';
 
         var defaults = {
@@ -2377,7 +2377,7 @@
             _this.core.$el.on('onAfterSlide.lg.tm', function(event, prevIndex) {
                 _this.core.$slide.eq(prevIndex).removeClass('lg-video-playing');
             });
-            
+
             if (_this.core.s.autoplayFirstVideo) {
                 _this.core.$el.on('onAferAppendSlide.lg.tm', function (e, index) {
                     if (!_this.core.lGalleryOn) {

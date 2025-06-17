@@ -1,7 +1,24 @@
 import React, { useState } from 'react';
 import { updateProfile, changePassword } from '../services/auth';
 import { useFlashMessage } from '../services/FlashMessageContext';
+// Utility function for time ago
+function timeAgo(dateString) {
+    // alert('timeAgo function called with dateString: ' + dateString);
+    if (!dateString) return 'Not set';
+    const seconds = Math.floor((Date.now() - new Date(dateString)) / 1000);
 
+    if (seconds < 60) return `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days} day${days !== 1 ? 's' : ''} ago`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months} month${months !== 1 ? 's' : ''} ago`;
+    const years = Math.floor(months / 12);
+    return `${years} year${years !== 1 ? 's' : ''} ago`;
+}
 export default function MyProfile({ user, setUser }) {
     const { showMessage } = useFlashMessage();
     const [profile, setProfile] = useState({
@@ -12,13 +29,11 @@ export default function MyProfile({ user, setUser }) {
     });
 
     const [passwords, setPasswords] = useState({
-        oldpassword: '',
-        newpassword: '',
-        newpassword_confirmation: '',
+        old_password: '',
+        new_password: '',
+        new_password_confirmation: '',
     });
     const [fieldErrors, setFieldErrors] = useState({});
-    const [passwordError, setPasswordError] = useState('');
-    const [passwordSuccess, setPasswordSuccess] = useState('');
     const handleProfileChange = (e) => {
         const { name, value } = e.target;
         setProfile({ ...profile, [name]: value });
@@ -55,41 +70,42 @@ export default function MyProfile({ user, setUser }) {
     };
 
     const handlePasswordChange = (e) => {
+        const { name, value } = e.target;
         setPasswords({ ...passwords, [e.target.name]: e.target.value });
-        setPasswordError('');
-        setPasswordSuccess('');
+        // Remove error for the current field only
+        setFieldErrors(prev => {
+            const updated = { ...prev };
+            delete updated[name];
+            return updated;
+        });
     };
 
     const handlePasswordSubmit = async (e) => {
         e.preventDefault();
-        setPasswordError('');
-        setPasswordSuccess('');
-
-        if (passwords.newpassword !== passwords.newpassword_confirmation) {
-            setPasswordError('New passwords do not match!');
-            return;
-        }
+        setFieldErrors({ ...fieldErrors, [e.target.name]: undefined });
 
         try {
             const response = await changePassword({
-                oldpassword: passwords.oldpassword,
-                newpassword: passwords.newpassword,
-                newpassword_confirmation: passwords.newpassword_confirmation,
+                old_password: passwords.old_password,
+                new_password: passwords.new_password,
+                new_password_confirmation: passwords.new_password_confirmation,
             });
 
             if (response.status === 200) {
                 setUser(prev => ({ ...prev, ...response.data.user }));
-                setPasswordSuccess('Password changed successfully!');
                 setPasswords({
-                    oldpassword: '',
-                    newpassword: '',
-                    newpassword_confirmation: '',
+                    old_password: '',
+                    new_password: '',
+                    new_password_confirmation: '',
                 });
-            } else {
-                setPasswordError(response.data.message || 'Failed to change password.');
+                showMessage(response.data.message, 'success');
             }
         } catch (error) {
-            setPasswordError(error.response?.data?.message || 'Something went wrong while changing password.');
+            if (error.response?.status === 422 && error.response.data?.errors) {
+                setFieldErrors(error.response.data.errors);
+            } else {
+                showMessage(error.response?.data?.message || 'Something went wrong while updating profile.');
+            }
         }
     };
 
@@ -133,7 +149,7 @@ export default function MyProfile({ user, setUser }) {
                                                 id="organisation"
                                                 name="organisation"
                                                 value={profile.organisation}
-                                                disabled
+                                                onChange={handleProfileChange}
                                             />
                                             <label htmlFor="organisation" title="Organization - Department*" data-title="Organization - Department*"></label>
                                             {fieldErrors.organisation && (
@@ -186,43 +202,50 @@ export default function MyProfile({ user, setUser }) {
                                     </h1>
                                     <hr className="hr-panel-heading" />
                                 </div>
-                                {passwordError && <div style={{ color: 'red' }}>{passwordError}</div>}
-                                {passwordSuccess && <div style={{ color: 'green' }}>{passwordSuccess}</div>}
                                 <form onSubmit={handlePasswordSubmit} autoComplete="off" id="staff_password_change_form">
                                     <div className="form-group">
                                         <div className="form-input-field">
                                             <input
                                                 type="password"
-                                                id="oldpassword"
-                                                name="oldpassword"
-                                                value={passwords.oldpassword}
+                                                id="old_password"
+                                                name="old_password"
+                                                value={passwords.old_password}
                                                 onChange={handlePasswordChange}
                                             />
-                                            <label htmlFor="oldpassword" title="Old password" data-title="Old password"></label>
+                                            <label htmlFor="old_password" title="Old password" data-title="Old password"></label>
+                                            {fieldErrors.old_password && (
+                                                <div style={{ color: 'red', fontSize: '12px' }}>{fieldErrors.old_password[0]}</div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="form-group">
                                         <div className="form-input-field">
                                             <input
                                                 type="password"
-                                                id="newpassword"
-                                                name="newpassword"
-                                                value={passwords.newpassword}
+                                                id="new_password"
+                                                name="new_password"
+                                                value={passwords.new_password}
                                                 onChange={handlePasswordChange}
                                             />
-                                            <label htmlFor="newpassword" title="New password" data-title="New password"></label>
+                                            <label htmlFor="new_password" title="New password" data-title="New password"></label>
+                                            {fieldErrors.new_password && (
+                                                <div style={{ color: 'red', fontSize: '12px' }}>{fieldErrors.new_password[0]}</div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="form-group">
                                         <div className="form-input-field">
                                             <input
                                                 type="password"
-                                                id="newpassword_confirmation"
-                                                name="newpassword_confirmation"
-                                                value={passwords.newpassword_confirmation}
+                                                id="new_password_confirmation"
+                                                name="new_password_confirmation"
+                                                value={passwords.new_password_confirmation}
                                                 onChange={handlePasswordChange}
                                             />
-                                            <label htmlFor="newpassword_confirmation" title="Repeat new password" data-title="Repeat new password"></label>
+                                            <label htmlFor="new_password_confirmation" title="Repeat new password" data-title="Repeat new password"></label>
+                                            {fieldErrors.new_password_confirmation && (
+                                                <div style={{ color: 'red', fontSize: '12px' }}>{fieldErrors.new_password_confirmation[0]}</div>
+                                            )}
                                         </div>
                                     </div>
                                     <button type="submit" className="btn btn-custom">Save</button>
@@ -231,11 +254,7 @@ export default function MyProfile({ user, setUser }) {
                             <div className="panel-footer">
                                 Password last changed:&nbsp;
                                 <span className="text-has-action" title={user?.password_changed_at}>
-                                    {user?.password_changed_at
-                                        ? `${Math.floor(
-                                            (Date.now() - new Date(user.password_changed_at)) / (1000 * 60 * 60 * 24 * 365)
-                                        )} years ago`
-                                        : 'Not set'}
+                                    {timeAgo(user?.password_changed_at)}
                                 </span>
                             </div>
                         </div>

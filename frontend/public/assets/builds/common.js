@@ -7,7 +7,7 @@ function confirm_delete() {
 }
 
 $(".userprofilewrap a").click(function(e) {
-  // $(this).attr("href") != "#" && 
+  // $(this).attr("href") != "#" &&
   if ($(this).attr("href") != "#" && $(this).attr("target") != "_blank") {
       showLoader();
   }

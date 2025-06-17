@@ -9,7 +9,7 @@
  */
 
 $("aside a").click(function(e) {
-    // $(this).attr("href") != "#" && 
+    // $(this).attr("href") != "#" &&
     if ($(this).attr("href") != "#" && $(this).attr("target") != "_blank") {
         showLoader();
     }
@@ -290,7 +290,7 @@ $(window).on("load", function() {
     init_btn_with_tooltips();
 });
 
-// Set datatables error throw console log
+// // Set datatables error throw console log
 $.fn.dataTable.ext.errMode = "throw";
 $.fn.dataTableExt.oStdClasses.sWrapper =
     "dataTables_wrapper form-inline dt-bootstrap table-loading";
